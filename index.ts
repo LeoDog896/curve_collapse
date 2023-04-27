@@ -4,6 +4,8 @@ type Func = (x: number) => number;
 // This takes in X and returns Y
 const equation: Func = x => Math.pow(x, 2);
 
+const appendItem = (arr: unknown[], item: unknown) => arr.push(item);
+
 
 //derivative and integral functions
 
@@ -90,8 +92,8 @@ function integ(a, b, degree, rB_input, rB_output) {
 //
 //RETURNS: (Number) 1 if true, 0 if false
 //
-function trueNum(boolean) {
-  if (boolean && (boolean != undefined)) return 1;
+function trueNum(boolean: boolean) {
+  if (boolean) return 1;
   else return 0;
 }
 
@@ -244,10 +246,6 @@ function curveLengthAt(x, degree, roundBoolean) {
 //   rB_randomCh - (Boolean) If true, rounds random selected value.
 //                           Rounds using 'degree', unless overridden by
 //                           sD_enable;;sD_input.
-//   rB_xyValue  - (Boolean) If true, rounds outputted coordinate values.
-//                           Does not modify computation time, as it only modifies
-//                           the output.
-//                           Uses 'degree' unless overridden by sD_enable;;sD_inputDeg.
 //
 //   specificDegree (Multivariate degree alteration for accuracy calculation)
 //   sD_enable   - (Boolean) If true, overrides 'degree' for sD variables.
@@ -268,20 +266,19 @@ function curveLengthAt(x, degree, roundBoolean) {
 //                          Intensive calculation.
 //
 export function pointExtrapolate(
-  a,
-  b,
-  n,
-  degree,
-  rB_input,
-  rB_internal,
-  rB_integRes,
-  rB_randomCh,
-  rB_xyValue,
-  sD_enable,
-  sD_inputDeg,
-  sD_integDeg,
-  sD_derivDeg,
-  sD_roundDeg,
+  a: number,
+  b: number,
+  n: number,
+  degree: number,
+  rB_input: boolean,
+  rB_internal: boolean,
+  rB_integRes: boolean,
+  rB_randomCh: boolean,
+  sD_enable: boolean,
+  sD_inputDeg: number,
+  sD_integDeg: number,
+  sD_derivDeg: number,
+  sD_roundDeg: number
 ) {
   //PRECHECK - Must set all rounded variables wherever possible.
   //Makes sure n is a whole number
@@ -339,9 +336,9 @@ export function pointExtrapolate(
 
   //STEP 2 - Approximate values of each point's x value using repeated estimation
   //List used for storing x values
-  let listX = [];
+  let listX: number[] = [];
   //Appends the first value x=a as x1
-  appendItem(listX, a);
+  listX = [...listX, a];
   //Repeat for n-2 sections (as last section has x=b as endpoint and isn't necessary to be solved)
   for (let i = 0; i < n - 2; i++) {
     //PART A
