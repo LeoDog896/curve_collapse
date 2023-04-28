@@ -28,3 +28,11 @@ Deno.test("base test 2", () => {
 
   assertEquals(val, estimatedVal);
 });
+
+Deno.test("base test 3", () => {
+	const data = JSON.parse(Deno.readTextFileSync("./artifacts/test3.json"));
+
+  const val = pointExtrapolate(-20, 20, 200, 3);
+
+	assertEquals(val, data);
+});

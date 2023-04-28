@@ -160,9 +160,6 @@ function curveLengthAt(x: number, degree: number) {
 //   ////
 //
 //   roundBoolean (Rounding-point reduction for efficiency calculation)
-//   rB_randomCh - (Boolean) If true, rounds random selected value.
-//                           Rounds using 'degree', unless overridden by
-//                           sD_enable;;sD_input.
 //
 //   specificDegree (Multivariate degree alteration for accuracy calculation)
 //   sD_enable   - (Boolean) If true, overrides 'degree' for sD variables.
@@ -187,7 +184,6 @@ export function pointExtrapolate(
   b: number,
   n: number,
   degree: number,
-  rB_randomCh = false,
   sD_enable = false,
   sD_inputDeg = 1,
   sD_integDeg = 1,
@@ -212,9 +208,6 @@ export function pointExtrapolate(
   //Rounding degree
   sD_roundDeg = trueNum(!sD_enable) * Math.round(degree) +
     trueNum(sD_enable) * Math.round(sD_roundDeg);
-  //sD_inputDeg supercedes degree when sD_enable is true, else ==
-  //Sets roundDec to use for rounding calculation
-  let roundDec = Math.pow(10, sD_inputDeg);
 
   //STEP 1 - Find total and partial curve lengths
   //get length of total function curve from x=a to x=b
@@ -243,9 +236,6 @@ export function pointExtrapolate(
     //Chooses a random x-value between x(i+1) (highest known x value) and x=b (endpoint)
     //First creates the additive random value with range 0 to b-known
     let randomAssign = random() * (b - listX[i]);
-    //Rounds randomAssign if rB_randomCh is true using sD_inputDeg or degree
-    randomAssign += trueNum(rB_randomCh) *
-      (Math.round(randomAssign * sD_inputDeg) / sD_inputDeg - randomAssign);
     let randomChoose = listX[i] + randomAssign;
     //Gets the result of the curve length from listX[i], or x(i+1) to randomChoose
     let randomChooseResult = curveLength(
