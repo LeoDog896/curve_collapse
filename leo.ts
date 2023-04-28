@@ -1,12 +1,12 @@
 type Func = (x: number) => number;
 
 // get the slope of a function at a point (derivative)
-function slope(f: Func, x: number, dx = Math.pow(10, -10)): number {
+export function slope(f: Func, x: number, dx = Math.pow(10, -10)): number {
   return (f(x + dx) - f(x)) / dx;
 }
 
 // get the integral of a function from a to b
-function integrate(a: number, b: number, dx: number, f: Func) {
+export function integrate(a: number, b: number, f: Func, dx = Math.pow(10, -3)) {
   // calculate the number of trapezoids
   const n = (b - a) / dx;
 
@@ -32,8 +32,3 @@ function integrate(a: number, b: number, dx: number, f: Func) {
 function distance(f: Func): Func {
     return x => Math.sqrt(1 + Math.pow(slope(f, x), 2));
 }
-
-// testing
-
-const func = (x: number) => x + Math.sin(x);
-
