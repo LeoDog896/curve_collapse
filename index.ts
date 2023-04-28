@@ -23,27 +23,19 @@ const appendItem = (arr: unknown[], item: unknown) => arr.push(item);
 //   degree    - (Number) The number of decimals you wish to round to.
 //                        Must be a positive whole number.
 //
-//   EFFICIENCY CALCULATIONS - Leave blank if unnecessary
-//
-//   roundBoolean (Rounding-point reduction for efficiency calculation)
-//   rB_input  - (Boolean) If true, rounds input.
-//                         Reduces computation time, but increases potential error.
-//   rB_output - (Boolean) If true, rounds output.
-//                         Reduces computation time, but increases potential error.
-//
 //RETURNS: (Number) The value of the derivative at x
 //
-function deriv(x, degree, rB_input, rB_output) {
+function deriv(x: number, degree: number) {
   //Makes sure degree is a whole number
   degree = Math.round(degree);
   //Sets the change in X, deltaX, to an inverse 10 power.
-  let delta = Math.pow(10, -1 * degree);
+  const delta = Math.pow(10, -1 * degree);
   //Alters x if rB_output is true
-  x += trueNum(rB_input) * (Math.round(x / delta) * delta - x);
+  x += Math.round(x / delta) * delta - x;
   //Inputs x and deltaX into the derivative equation
   let result = (equation(x + delta) - equation(x - delta)) / (2 * delta);
   //Alters result if rB_output is true
-  result += trueNum(rB_output) * (Math.round(result / delta) * delta - result);
+  result += Math.round(result / delta) * delta - result;
   //Returns the final value
   return result;
 }
