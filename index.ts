@@ -1,11 +1,18 @@
 type Func = (x: number) => number;
 
+// generate a new seeded random number generator
+const newRandom = (seed = 1) => {
+  return () => {
+    const x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
+  };
+};
+
 // Input the equation you wish to extrapolate points from
 // This takes in X and returns Y
-const equation: Func = x => Math.pow(x, 2);
+const equation: Func = (x) => Math.pow(x, 2);
 
 const appendItem = (arr: unknown[], item: unknown) => arr.push(item);
-
 
 //derivative and integral functions
 
@@ -85,16 +92,13 @@ function integ(a, b, degree, rB_input, rB_output) {
   return result;
 }
 
-//trueNum - transfers boolean operators into numbers
-//
-//INPUTS
-//   boolean - (Boolean) Any boolean value.
-//
-//RETURNS: (Number) 1 if true, 0 if false
-//
+/** transfers boolean operators into numbers
+ *
+ * @param boolean - the boolean value to convert
+ * @returns 1 if true, 0 if false
+ */
 function trueNum(boolean: boolean) {
-  if (boolean) return 1;
-  else return 0;
+  return boolean ? 1 : 0;
 }
 
 ///////////////////////////////////////////////////////
@@ -270,30 +274,19 @@ export function pointExtrapolate(
   b: number,
   n: number,
   degree: number,
-  rB_input: boolean,
-  rB_internal: boolean,
-  rB_integRes: boolean,
-  rB_randomCh: boolean,
-  sD_enable: boolean,
-  sD_inputDeg: number,
-  sD_integDeg: number,
-  sD_derivDeg: number,
-  sD_roundDeg: number
+  rB_input = false,
+  rB_internal = false,
+  rB_integRes = false,
+  rB_randomCh = false,
+  sD_enable = false,
+  sD_inputDeg = 1,
+  sD_integDeg = 1,
+  sD_derivDeg = 1,
+  sD_roundDeg = 1,
 ) {
   //PRECHECK - Must set all rounded variables wherever possible.
   //Makes sure n is a whole number
   n = Math.round(n);
-  //In the case of sD_enable is false,
-  //sD_derivDeg, sD_integDeg, and sD_roundDeg don't exist, so replace with 1s
-  if (
-    sD_inputDeg == undefined || sD_integDeg == undefined ||
-    sD_derivDeg == undefined || sD_roundDeg == undefined
-  ) {
-    sD_inputDeg = 1;
-    sD_integDeg = 1;
-    sD_derivDeg = 1;
-    sD_roundDeg = 1;
-  }
   //Sets the degrees and makes sure they're whole numbers
   //If sD_enable is true, overrides with associated sD_values
   //Else, replace with degree for all
@@ -340,11 +333,12 @@ export function pointExtrapolate(
   //Appends the first value x=a as x1
   listX = [...listX, a];
   //Repeat for n-2 sections (as last section has x=b as endpoint and isn't necessary to be solved)
+  const random = newRandom();
   for (let i = 0; i < n - 2; i++) {
     //PART A
     //Chooses a random x-value between x(i+1) (highest known x value) and x=b (endpoint)
     //First creates the additive random value with range 0 to b-known
-    let randomAssign = Math.random() * (b - listX[i]);
+    let randomAssign = random() * (b - listX[i]);
     //Rounds randomAssign if rB_randomCh is true using sD_inputDeg or degree
     randomAssign += trueNum(rB_randomCh) *
       (Math.round(randomAssign * sD_inputDeg) / sD_inputDeg - randomAssign);
@@ -452,7 +446,7 @@ export function pointExtrapolate(
 
   //STEP 3 - Get y-values at gathered X-coordinates
   //Use the list listY for y-values at each associated X-value
-  let listY = [];
+  const listY: number[] = [];
   //For loop for each x-value
   for (let k = 0; k < listX.length; k++) {
     appendItem(listY, equation(listX[k]));
@@ -473,10 +467,7 @@ export function pointExtrapolate(
   //
   //CHANGE THIS CODE FOR IT TO BE FUNCTIONAL ELSEWHERE.
   //
-  let result = "(";
-  for (let r = 0; r < listX.length; r++) {
-    result += listX[r] + ", " + listY[r] + ")";
-    if (r != listX.length - 1) result += ", (";
-  }
-  return result;
+
+  // instead, return the coordinates as an array of arrays (points)
+  return listX.map((x, i) => [x, listY[i]]);
 }
