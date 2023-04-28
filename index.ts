@@ -14,17 +14,17 @@ const equation: Func = (x) => Math.pow(x, 2);
 
 const appendItem = (arr: unknown[], item: unknown) => arr.push(item);
 
-//derivative and integral functions
-
-//deriv - Gets the derivative of an equation at the specified coordinate, estiamted.
-//
-//INPUTS
-//   x         - (Number) x value of the function you wish to get the derivative of.
-//   degree    - (Number) The number of decimals you wish to round to.
-//                        Must be a positive whole number.
-//
-//RETURNS: (Number) The value of the derivative at x
-//
+/**
+ * Gets the derivative of an equation at the specified coordinate, estiamted.
+ * Since a derivative is the slope of a line tangent to a point on a curve,
+ * we can estimate the slope by finding the slope of a line between two very
+ * close points on the curve.
+ * 
+ * @param x - x value of the function you wish to get the derivative of.
+ * @param degree - The number of decimals you wish to round to. Must be a positive whole number.
+ * 
+ * @returns The value of the derivative at x
+ */
 function deriv(x: number, degree: number) {
   //Makes sure degree is a whole number
   degree = Math.round(degree);
@@ -48,9 +48,6 @@ function deriv(x: number, degree: number) {
 function trueNum(boolean: boolean) {
   return boolean ? 1 : 0;
 }
-
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
 
 //pointExtrapolate and internal functions
 
@@ -163,21 +160,6 @@ function curveLengthAt(x: number, degree: number) {
 //   ////
 //
 //   roundBoolean (Rounding-point reduction for efficiency calculation)
-//   rB_input    - (Boolean) If true, rounds input.
-//                           Uses 'degree', unless overriden by sD_enable;;sD_inputDeg.
-//                           Reduces computation time, but increases potential error.
-//   rB_internal - (Boolean) If true, rounds the base values used in integral estimation.
-//                           Rounding uses 'degree' for derivative result rounding,
-//                           unless overridden by sD_enable;;sD_derivDeg.
-//                           Significantly reduces computation time,
-//                           but increases potential error.
-//   rB_integRes - (Boolean) If true, rounds the results of integral calculations.
-//                           Rounding uses 'degree' for integral result rounding,
-//                           unless overridden by sD_enable;;sD_integDeg.
-//                           Reduces computation time, but increases potential error.
-//                           WARNING: When using sD_roundDeg, if rounding-point of
-//                           sD_roundDeg is greater, calculations will be invalidated.
-//                           Check if 2^sD_roundDeg>10^sD_integDeg.
 //   rB_randomCh - (Boolean) If true, rounds random selected value.
 //                           Rounds using 'degree', unless overridden by
 //                           sD_enable;;sD_input.
@@ -205,8 +187,6 @@ export function pointExtrapolate(
   b: number,
   n: number,
   degree: number,
-  rB_input = false,
-  rB_integRes = false,
   rB_randomCh = false,
   sD_enable = false,
   sD_inputDeg = 1,
@@ -232,12 +212,9 @@ export function pointExtrapolate(
   //Rounding degree
   sD_roundDeg = trueNum(!sD_enable) * Math.round(degree) +
     trueNum(sD_enable) * Math.round(sD_roundDeg);
-  //Rounds a and b if rB_input is true
   //sD_inputDeg supercedes degree when sD_enable is true, else ==
   //Sets roundDec to use for rounding calculation
   let roundDec = Math.pow(10, sD_inputDeg);
-  a += trueNum(rB_input) * (Math.round(a * roundDec) / roundDec - a);
-  b += trueNum(rB_input) * (Math.round(b * roundDec) / roundDec - b);
 
   //STEP 1 - Find total and partial curve lengths
   //get length of total function curve from x=a to x=b
@@ -368,14 +345,6 @@ export function pointExtrapolate(
   //For loop for each x-value
   for (let k = 0; k < listX.length; k++) {
     appendItem(listY, equation(listX[k]));
-  }
-
-  //STEP 3.5 - If rB_xyValue is true, round the x and y values
-  for (let v = 0; v < listX.length; v++) {
-    listX[v] += trueNum(rB_input) *
-      (Math.round(listX[v] * roundDec) / roundDec - listX[v]);
-    listY[v] += trueNum(rB_input) *
-      (Math.round(listY[v] * roundDec) / roundDec - listY[v]);
   }
 
   //STEP 4 - Compile the coordinates and return
