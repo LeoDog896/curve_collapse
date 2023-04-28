@@ -34,7 +34,6 @@ function deriv(x: number, degree: number) {
   x += Math.round(x / delta) * delta - x;
   //Inputs x and deltaX into the derivative equation
   let result = (equation(x + delta) - equation(x - delta)) / (2 * delta);
-  //Alters result if rB_output is true
   result += Math.round(result / delta) * delta - result;
   //Returns the final value
   return result;
@@ -49,42 +48,38 @@ function trueNum(boolean: boolean) {
   return boolean ? 1 : 0;
 }
 
-//pointExtrapolate and internal functions
-
-//curveLength - Gets the length of a curve, estimate based off of integral function
-//
-//   a           - (Number) x value of the lower endpoint of the integral.
-//   b           - (Number) x value of the upper endpoint of the integral.
-//   degree      - (Number) The amount of subdivisions taken, as a positive power of 10.
-//                          Must be a positive whole number.
-//   specificDegree (Multivariate degree alteration for accuracy calculation)
-//   sD_enable   - (Boolean) If true, overrides 'degree' for sD variables.
-//                           All sD values must be filled for proper functionality
-//                           if this is the case, otherwise all default to 1.
-//   sD_inputDeg - (Number) Sets the decimals with which to round the input to.
-//                          ONLY APPLIES if rB_input is enabled.
-//                          Minimal calculation.
-//   sD_integDeg - (Number) Sets the amount of subdivisions taken in integral
-//                          calculation, determined by 10^input.
-//                          Intensive calculation.
-//   sD_derivDeg - (Number) Sets the decimal the degree is rounded to in
-//                          derivative calculation, determined by 10^-input.
-//                          Minimal calculation.
-//
-//RETURNS: (Number) The length of the curve from x=a to x=b
-//
+/**
+ * Gets the length of a curve, estimate based off of integral function
+ * 
+ * @param a - x value of the lower endpoint of the integral.
+ * @param b - x value of the upper endpoint of the integral.
+ * @param degree - The amount of subdivisions taken, as a positive power of 10.
+ *                         Must be a positive whole number.
+ * @param sD_enable - If true, overrides 'degree' for sD variables.
+ *                        All sD values must be filled for proper functionality
+ *                       if this is the case, otherwise all default to 1.
+ * @param sD_inputDeg - Sets the decimals with which to round the input to.
+ *                         ONLY APPLIES if rB_input is enabled.
+ *                        Minimal calculation.
+ * @param sD_integDeg - Sets the amount of subdivisions taken in integral
+ *                        calculation, determined by 10^input.
+ *                       Intensive calculation.
+ * @param sD_derivDeg - Sets the decimal the degree is rounded to in
+ *                       derivative calculation, determined by 10^-input.
+ *                     Minimal calculation.
+ * 
+ * @returns The length of the curve from x=a to x=b
+ * 
+ */
 function curveLength(
-  a,
-  b,
-  degree,
-  sD_enable,
-  sD_inputDeg,
-  sD_integDeg,
-  sD_derivDeg,
+  a: number,
+  b: number,
+  degree: number,
+  sD_enable: boolean,
+  sD_inputDeg: number,
+  sD_integDeg: number,
+  sD_derivDeg: number,
 ) {
-  //Note: the code in here is a bit less organized than in pointExtrapolate(), sorry!
-  // -B
-
   //PRECHECK
   //In the case sD_enable is false,
   //sD_integDeg and sD_derivDeg don't exist, so replace with 1s
@@ -329,22 +324,6 @@ export function pointExtrapolate(
   //This then appends the final value to list, being x=b.
   appendItem(listX, b);
 
-  //STEP 3 - Get y-values at gathered X-coordinates
-  //Use the list listY for y-values at each associated X-value
-  const listY: number[] = [];
-  //For loop for each x-value
-  for (let k = 0; k < listX.length; k++) {
-    appendItem(listY, equation(listX[k]));
-  }
-
-  //STEP 4 - Compile the coordinates and return
-  //
-  //NOTE: Since this is in an app-oriented javaScript, the output
-  //will be noted as a string.
-  //
-  //CHANGE THIS CODE FOR IT TO BE FUNCTIONAL ELSEWHERE.
-  //
-
-  // instead, return the coordinates as an array of arrays (points)
-  return listX.map((x, i) => [x, listY[i]]);
+  // Then return the list of X values mapped to their points (x, y)
+  return listX.map((x) => [x, equation(x)]);
 }
