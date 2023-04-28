@@ -31,6 +31,8 @@ export function integral(
 // gets the upper bound of an integral
 // where ing(f, a, b) = d, find b.
 export function getUpperBound(f: Func, a: number, d: number, dx = 10 ** -3): number {
+  if (d === 0) return 0;
+
   let dxCount = 0;
   let sum = TRAM(a, f, dx);
   while (sum < d) {
@@ -52,15 +54,16 @@ export function makePoints(f: Func, a: number, b: number, n: number, dx = 10 ** 
   const d = integral(distance(f), a, b, dx);
 
   // we can then divide this to make "distance steps" to count when we reverse d to get the bounds of each step.
-  const step = d / n;
+  const step = d / (n - 1);
+  const steps = Array.from({ length: n }, (_, i) => a + step * i);
 
   // now, we can make the points.
-  const points: [number, number][] = [];
+  const points: [number, number][] = [[a, f(a)]];
 
   // we start at a, and then we add the step to it until we reach b.
-  for (let i = a; i < b; i += step) {
+  for (const i of steps.slice(1)) {
     // we then get the upper bound of the integral of distance from a to b, where the distance is equal to the step.
-    const b = getUpperBound(distance(f), i, step, dx);
+    const b = getUpperBound(distance(f), 0, i, dx);
     // we then add the point to the array.
     points.push([b, f(b)]);
   }
