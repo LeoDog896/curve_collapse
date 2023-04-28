@@ -40,50 +40,6 @@ function deriv(x: number, degree: number) {
   return result;
 }
 
-//integ - Gets the integral of an equation between the specified coordinates, estimated.
-//
-//INPUTS
-//   a         - (Number) x value of the lower endpoint of the integral.
-//   b         - (Number) x value of the upper endpoint of the integral.
-//   degree    - (Number) The amount of subdivisions taken, as a positive power of 10.
-//                        Must be a positive whole number.
-//
-//   EFFICIENCY CALCULATIONS - Leave blank if unnecessary
-//
-//   roundBoolean (Rounding-point reduction for efficiency calculation)
-//   rB_input  - (Boolean) If true, rounds input.
-//                         Reduces computation time, but increases potential error.
-//   rB_output - (Boolean) If true, rounds output.
-//                         Reduces computation time, but increases potential error.
-//
-//RETURNS: (Number) The area under the curve from x=a to x=b
-//
-function integ(a, b, degree, rB_input, rB_output) {
-  //Makes sure degree is a whole number
-  degree = Math.round(degree);
-  //Sets the number of subdivisions to be taken as delta
-  let delta = Math.pow(10, degree);
-  //Alters a and b if rB_input is true
-  a += trueNum(rB_input) * (Math.round(a * delta) / delta - a);
-  b += trueNum(rB_input) * (Math.round(b * delta) / delta - b);
-  //Starts the sum as 0, and the length/range from a to b along x
-  let result = 0;
-  let range = b - a;
-  //Repeat for delta times
-  for (let i = 0; i < delta; i++) {
-    //Trapezoid equation A = ( (b1 + b2)/2 ) * h
-
-    //Base 1 and base 2 taken as the y val
-    let bound1 = a + range * (i / delta);
-    let bound2 = a + range * ((i + 1) / delta);
-    result += ((equation(bound1) + equation(bound2)) / 2) * (range / delta);
-  }
-  //Rounds result if rB_output is true
-  result += trueNum(rB_output) * (Math.round(result * delta) / delta - result);
-  //Returns the final value
-  return result;
-}
-
 /** transfers boolean operators into numbers
  *
  * @param boolean - the boolean value to convert
@@ -104,20 +60,6 @@ function trueNum(boolean: boolean) {
 //   b           - (Number) x value of the upper endpoint of the integral.
 //   degree      - (Number) The amount of subdivisions taken, as a positive power of 10.
 //                          Must be a positive whole number.
-//
-//   EFFICIENCY CALCULATIONS - Leave blank if unnecessary
-//
-//   roundBoolean (Rounding-point reduction for efficiency calculation)
-//   rB_input    - (Boolean) If true, rounds input.
-//                           Uses degree, unless overridden by sD_enable;sD_integDeg.
-//                           Reduces computation time, but increases potential error.
-//   rB_internal - (Boolean) If true, rounds the base values used in integral estimation.
-//                           Rounding uses 'degree' for derivative result rounding.
-//                           Significantly reduces computation time,
-//                           but increases potential error.
-//   rB_output   - (Boolean) If true, rounds output.
-//                           Reduces computation time, but increases potential error.
-//
 //   specificDegree (Multivariate degree alteration for accuracy calculation)
 //   sD_enable   - (Boolean) If true, overrides 'degree' for sD variables.
 //                           All sD values must be filled for proper functionality
@@ -138,9 +80,6 @@ function curveLength(
   a,
   b,
   degree,
-  rB_input,
-  rB_internal,
-  rB_output,
   sD_enable,
   sD_inputDeg,
   sD_integDeg,
@@ -176,8 +115,8 @@ function curveLength(
   //Else uses delta
   let roundDec = trueNum(!sD_enable) * delta +
     trueNum(sD_enable) * Math.pow(10, Math.round(sD_inputDeg));
-  a += trueNum(rB_input) * (Math.round(a * roundDec) / roundDec - a);
-  b += trueNum(rB_input) * (Math.round(b * roundDec) / roundDec - b);
+  a += Math.round(a * roundDec) / roundDec - a;
+  b += Math.round(b * roundDec) / roundDec - b;
   //Starts the sum as 0, and the length/range from a to b along x
   let result = 0;
   let range = b - a;
@@ -190,18 +129,18 @@ function curveLength(
     let bound2 = a + range * ((i + 1) / delta);
     //rB_internal rounds output of curveLengthAt() when true
     //derivDeg is used for degree in case sD_enable is true
-    result += ((curveLengthAt(bound1, derivDeg, rB_internal) +
-      curveLengthAt(bound2, derivDeg, rB_internal)) / 2) * (range / delta);
+    result += ((curveLengthAt(bound1, derivDeg) +
+      curveLengthAt(bound2, derivDeg)) / 2) * (range / delta);
   }
   //Rounds result if rB_output is true
-  result += trueNum(rB_output) * (Math.round(result * delta) / delta - result);
+  result += Math.round(result * delta) / delta - result;
   //Returns the final value
   return result;
 }
 //curveLengthAt - conjuction function to curveLength
 //REMAIN THE SAME! EDITING WILL MESS WITH PROGRAM!
-function curveLengthAt(x, degree, roundBoolean) {
-  return Math.sqrt(1 + Math.pow(deriv(x, degree, false, roundBoolean), 2));
+function curveLengthAt(x: number, degree: number) {
+  return Math.sqrt(1 + Math.pow(deriv(x, degree), 2));
 }
 
 //pointExtrapolate - Gets the coordinates of equidistant points along a curve between 2 x-values
@@ -267,7 +206,6 @@ export function pointExtrapolate(
   n: number,
   degree: number,
   rB_input = false,
-  rB_internal = false,
   rB_integRes = false,
   rB_randomCh = false,
   sD_enable = false,
@@ -307,9 +245,6 @@ export function pointExtrapolate(
     a,
     b,
     sD_integDeg,
-    false,
-    rB_internal,
-    rB_integRes,
     sD_enable,
     sD_inputDeg,
     sD_derivDeg,
@@ -340,9 +275,6 @@ export function pointExtrapolate(
       listX[i],
       randomChoose,
       sD_integDeg,
-      false,
-      rB_internal,
-      rB_integRes,
       sD_enable,
       sD_inputDeg,
       sD_derivDeg,
@@ -376,9 +308,6 @@ export function pointExtrapolate(
         listX[i],
         randomChoose,
         sD_integDeg,
-        false,
-        rB_internal,
-        rB_integRes,
         sD_enable,
         sD_inputDeg,
         sD_derivDeg,
@@ -413,9 +342,6 @@ export function pointExtrapolate(
         listX[i],
         randomChoose,
         sD_integDeg,
-        false,
-        rB_internal,
-        rB_integRes,
         sD_enable,
         sD_inputDeg,
         sD_derivDeg,
