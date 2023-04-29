@@ -1,18 +1,17 @@
 type Func = (x: number) => number;
 
-// get the slope of a function at a point (derivative)
-export function slope(f: Func, x: number, dx = 10 ** -10): number {
-  return (f(x + dx) - f(x)) / dx;
+// get the derivative of a function
+export function derivative(f: Func, dx = 10 ** -10): Func {
+  return (x) => (f(x + dx) - f(x)) / dx;
 }
 
 // get the trapezoidal area under a curve
-export function TRAM(
-  a: number,
+// this is used for numerical integration
+export const TRAM = (
   f: Func,
+  a: number,
   dx = 10 ** -3,
-) {
-  return dx * (f(a) + f(a + dx)) / 2;
-}
+) => dx * (f(a) + f(a + dx)) / 2;
 
 // get the integral of a function
 export function integral(
@@ -23,20 +22,25 @@ export function integral(
 ) {
   let sum = 0;
   for (let i = a; i < b; i += dx) {
-    sum += TRAM(i, f, dx);
+    sum += TRAM(f, i, dx);
   }
   return sum;
 }
 
 // gets the upper bound of an integral
 // where ing(f, a, b) = d, find b.
-export function getUpperBound(f: Func, a: number, d: number, dx = 10 ** -3): number {
-  if (d === 0) return 0;
+export function getUpperBound(
+  f: Func,
+  a: number,
+  d: number,
+  dx = 10 ** -3,
+): number {
+  if (d === 0) return a;
 
   let dxCount = 0;
-  let sum = TRAM(a, f, dx);
+  let sum = TRAM(f, a, dx);
   while (sum < d) {
-    sum += TRAM(a + dxCount * dx, f, dx);
+    sum += TRAM(f, a + dxCount * dx, dx);
     dxCount++;
   }
 
@@ -44,26 +48,34 @@ export function getUpperBound(f: Func, a: number, d: number, dx = 10 ** -3): num
 }
 
 // generates a function that returns the distance travelled along a path
-function distance(f: Func): Func {
-  return (x) => Math.sqrt(1 + Math.pow(slope(f, x), 2));
-}
+// this follows pygatherom's therom, except it uses the derivative of the
+// function instead of a point on the function.
+const distance = (f: Func): Func => (x) =>
+  Math.sqrt(1 + Math.pow(derivative(f)(x), 2));
 
 // make equidistant points
-export function makePoints(f: Func, a: number, b: number, n: number, dx = 10 ** -3): [number, number][] {
+export function makePoints(
+  f: Func,
+  a: number,
+  b: number,
+  n: number,
+  dx = 10 ** -3,
+): [number, number][] {
   // first, get the total distance travelled from a to b.
   const d = integral(distance(f), a, b, dx);
 
   // we can then divide this to make "distance steps" to count when we reverse d to get the bounds of each step.
   const step = d / (n - 1);
-  const steps = Array.from({ length: n }, (_, i) => a + step * i);
+  const steps = Array.from({ length: n }, (_, i) => step * i);
 
   // now, we can make the points.
-  const points: [number, number][] = [[a, f(a)]];
+  const points: [number, number][] = [];
 
   // we start at a, and then we add the step to it until we reach b.
-  for (const i of steps.slice(1)) {
+  for (const i of steps) {
+    console.log(i);
     // we then get the upper bound of the integral of distance from a to b, where the distance is equal to the step.
-    const b = getUpperBound(distance(f), 0, i, dx);
+    const b = getUpperBound(distance(f), a, a + i, dx);
     // we then add the point to the array.
     points.push([b, f(b)]);
   }
