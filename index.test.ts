@@ -2,12 +2,13 @@ import { getUpperBound, integral, makePoints, derivative } from "./index.ts";
 import { assertAlmostEquals } from "https://deno.land/std@0.183.0/testing/asserts.ts";
 
 function assertArrayAlmostEquals(
-  actual: [number, number][],
-  expected: [number, number][],
+  actual: number[][],
+  expected: number[][],
 ) {
   for (let i = 0; i < actual.length; i++) {
-    assertAlmostEquals(actual[i][0], expected[i][0]);
-    assertAlmostEquals(actual[i][1], expected[i][1]);
+    for (let j = 0; j < actual[i].length; j++) {
+      assertAlmostEquals(actual[i][j], expected[i][j]);
+    }
   }
 }
 
@@ -45,7 +46,36 @@ Deno.test("make points", () => {
   ]);
 });
 
-Deno.test("make points real", () => {
-  console.log(makePoints((x) => x + Math.sin(x), 0, 6.5, 11));
-  console.log(makePoints((x) => x ** 2, 1, 10, 5));
+Deno.test("from desmos graph", () => {
+  const points = makePoints((x) => x + Math.sin(x), 0, 6.5, 11)
+
+  const expected = [
+    [ 0, 0 ],
+    [ 0.452, 0.8887655571845614 ],
+    [ 0.9460000000000001, 1.7570822713207712 ],
+    [ 1.551, 2.5508040591218535 ],
+    [ 2.388, 3.0722630600043823 ],
+    [ 3.3810000000000002, 3.143873082221994 ],
+    [ 4.333, 3.404108898111191 ],
+    [ 5.0440000000000005, 4.098480923592157 ],
+    [ 5.583, 4.938640593075381 ],
+    [ 6.051, 5.820895262355633 ],
+    [ 6.4990000000000006, 6.713143293064868 ]
+  ]
+
+  assertArrayAlmostEquals(points, expected)
+})
+
+Deno.test("use old test case", () => {
+  const power = makePoints((x) => x ** 2, 1, 10, 5);
+
+  const expected = [
+    [ 1.3860000000000001, 1.9209960000000004 ],
+    [ 5.148, 26.501903999999996 ],
+    [ 7.163, 51.308569000000006 ],
+    [ 8.727, 76.16052900000001 ],
+    [ 10.051, 101.02260100000001 ]
+  ]
+
+  assertArrayAlmostEquals(power, expected)
 })
