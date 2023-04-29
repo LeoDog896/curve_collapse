@@ -1,6 +1,0 @@
-{
-  "tasks": {
-    "test": "deno test --no-check --allow-read=./ --allow-write=./ ./",
-    "test:leo": "deno test --allow-read=./ --allow-write=./ leo.test.ts"
-  }
-}
