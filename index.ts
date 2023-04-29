@@ -73,7 +73,6 @@ export function makePoints(
 
   // we start at a, and then we add the step to it until we reach b.
   for (const i of steps) {
-    console.log(i);
     // we then get the upper bound of the integral of distance from a to b, where the distance is equal to the step.
     const b = getUpperBound(distance(f), a, a + i, dx);
     // we then add the point to the array.
