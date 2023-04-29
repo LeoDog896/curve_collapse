@@ -1,4 +1,4 @@
-import { getUpperBound, integral, makePoints, derivative } from "./index.ts";
+import { getUpperBound, integral, collapse, derivative } from "./index.ts";
 import { assertAlmostEquals } from "https://deno.land/std@0.183.0/testing/asserts.ts";
 
 function assertArrayAlmostEquals(
@@ -31,7 +31,7 @@ Deno.test("integral", () => {
 });
 
 Deno.test("make points", () => {
-  const points = makePoints((x) => x, 0, 1, 10);
+  const points = collapse((x) => x, 0, 1, 10);
   assertArrayAlmostEquals(points, [
     [0, 0],
     [0.111, 0.111],
@@ -47,7 +47,7 @@ Deno.test("make points", () => {
 });
 
 Deno.test("from desmos graph", () => {
-  const points = makePoints((x) => x + Math.sin(x), 0, 6.5, 11)
+  const points = collapse((x) => x + Math.sin(x), 0, 6.5, 11)
 
   const expected = [
     [ 0, 0 ],
@@ -67,7 +67,7 @@ Deno.test("from desmos graph", () => {
 })
 
 Deno.test("use old test case", () => {
-  const power = makePoints((x) => x ** 2, 1, 10, 5);
+  const power = collapse((x) => x ** 2, 1, 10, 5);
 
   const expected = [
     [ 1.3860000000000001, 1.9209960000000004 ],

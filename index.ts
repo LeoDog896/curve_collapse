@@ -53,8 +53,8 @@ export function getUpperBound(
 const distance = (f: Func): Func => (x) =>
   Math.sqrt(1 + Math.pow(derivative(f)(x), 2));
 
-// make equidistant points
-export function makePoints(
+// make equidistant points along a function
+export function collapse(
   f: Func,
   a: number,
   b: number,
