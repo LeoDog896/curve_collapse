@@ -1,9 +1,8 @@
 type Func = (x: number) => number;
 
 // get the derivative of a function
-export function derivative(f: Func, dx = 10 ** -10): Func {
-  return (x) => (f(x + dx) - f(x)) / dx;
-}
+export const derivative = (f: Func, dx = 10 ** -10): Func => (x) =>
+  (f(x + dx) - f(x)) / dx;
 
 // get the trapezoidal area under a curve
 // this is used for numerical integration
@@ -44,7 +43,7 @@ export function getUpperBound(
     dxCount++;
   }
 
-  return a + dxCount * dx;
+  return a + (dxCount * dx);
 }
 
 // generates a function that returns the distance travelled along a path
@@ -64,20 +63,16 @@ export function collapse(
   // first, get the total distance travelled from a to b.
   const d = integral(distance(f), a, b, dx);
 
-  // we can then divide this to make "distance steps" to count when we reverse d to get the bounds of each step.
+  // we then divide this to make "distance steps" to count when we reverse d to get the bounds of each step.
+  // essentially, steps[i] = (d * i) / (n - 1) for i = [0..n)
   const step = d / (n - 1);
   const steps = Array.from({ length: n }, (_, i) => step * i);
 
-  // now, we can make the points.
-  const points: [number, number][] = [];
-
-  // we start at a, and then we add the step to it until we reach b.
-  for (const i of steps) {
+  // for every point:
+  return steps.map(i => {
     // we then get the upper bound of the integral of distance from a to b, where the distance is equal to the step.
     const b = getUpperBound(distance(f), a, a + i, dx);
     // we then add the point to the array.
-    points.push([b, f(b)]);
-  }
-
-  return points;
+    return [b, f(b)];
+  })
 }
