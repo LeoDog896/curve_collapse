@@ -1,4 +1,5 @@
 type Func = (x: number) => number;
+type Point = [number, number]
 
 // get the derivative of a function
 export const derivative = (f: Func, dx = 10 ** -10): Func => (x) =>
@@ -59,7 +60,7 @@ export function collapse(
   b: number,
   n: number,
   dx = 10 ** -3,
-): [number, number][] {
+): Point[] {
   // first, get the total distance travelled from a to b.
   const d = integral(distance(f), a, b, dx);
 
